@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Specs/">
+    <File Path=".github/Specs/SpecClientes.md" />
+    <File Path=".github/Specs/SpecIntereses.md" />
+    <File Path=".github/Specs/SpecLogin.md" />
+    <File Path=".github/Specs/SpecTiposCliente.md" />
+    <File Path=".github/Specs/SpecUsers.md" />
+  </Folder>
+  <Project Path="Curso.Application/Curso.Application.csproj" />
+  <Project Path="Curso.Domain/Curso.Domain.csproj" />
+  <Project Path="Curso.Infrastructure/Curso.Infrastructure.csproj" />
+  <Project Path="Curso.WebApp/Curso.WebApp.csproj" />
+</Solution>

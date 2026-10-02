@@ -1,0 +1,55 @@
+@page "/tipos-cliente/nuevo"
+@page "/tipos-cliente/editar/{Id:guid}"
+@inject ITipoClienteService TipoService
+@inject NavigationManager Nav
+
+<h3>@(isEdit ? "Editar tipo de cliente" : "Nuevo tipo de cliente")</h3>
+
+<EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <InputText class="form-control" @bind-Value="model.Descripcion" />
+        <ValidationMessage For="() => model.Descripcion" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick="Cancel">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private TipoClienteInput model = new TipoClienteInput();
+    private bool isEdit => Id.HasValue && Id.Value != Guid.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (isEdit)
+        {
+            var existing = await TipoService.GetTipoClienteByIdAsync(Id.Value);
+            if (existing != null)
+            {
+                model.Descripcion = existing.Descripcion;
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (isEdit)
+        {
+            await TipoService.UpdateTipoClienteAsync(Id.Value, model);
+        }
+        else
+        {
+            await TipoService.CrearTipoClienteAsync(model);
+        }
+        Nav.NavigateTo("/tipos-cliente");
+    }
+
+    private void Cancel() => Nav.NavigateTo("/tipos-cliente");
+}
