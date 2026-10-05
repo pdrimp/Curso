@@ -10,6 +10,9 @@ namespace Curso.Application
         {
             // Register application services here
             services.AddScoped<ITipoClienteService, TipoClienteService>();
+            services.AddScoped<IInteresService, InteresService>();
+            services.AddScoped<IClienteService, ClienteService>();
+            // Repositorios usados por servicios (interfaces are implemented in Infrastructure)
             return services;
         }
     }

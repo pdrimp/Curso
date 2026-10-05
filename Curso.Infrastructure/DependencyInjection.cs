@@ -16,6 +16,8 @@ namespace Curso.Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=CursoDb;Integrated Security=True"));
 
             services.AddScoped<ITipoClienteRepository, TipoClienteRepository>();
+            services.AddScoped<IInteresRepository, InteresRepository>();
+            services.AddScoped<IClienteRepository, ClienteRepository>();
 
             return services;
         }

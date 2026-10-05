@@ -1,0 +1,55 @@
+@page "/Intereses/nuevo"
+@page "/Intereses/editar/{Id:guid}"
+@inject IInteresService InteresService
+@inject NavigationManager Nav
+
+<h3>@(isEdit ? "Editar interés" : "Nuevo interés")</h3>
+
+<EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <InputText class="form-control" @bind-Value="model.Descripcion" />
+        <ValidationMessage For="() => model.Descripcion" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick="Cancel">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private InteresInput model = new InteresInput();
+    private bool isEdit => Id.HasValue && Id.Value != Guid.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (isEdit)
+        {
+            var existing = await InteresService.GetInteresByIdAsync(Id.Value);
+            if (existing != null)
+            {
+                model.Descripcion = existing.Descripcion;
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (isEdit)
+        {
+            await InteresService.UpdateInteresAsync(Id.Value, model);
+        }
+        else
+        {
+            await InteresService.CrearInteresAsync(model);
+        }
+        Nav.NavigateTo("/Intereses");
+    }
+
+    private void Cancel() => Nav.NavigateTo("/Intereses");
+}

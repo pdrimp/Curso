@@ -1,0 +1,91 @@
+@page "/Intereses"
+@inject IInteresService InteresService
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<h3>Intereses</h3>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="CreateNew">Nuevo interés</button>
+</div>
+
+@if (items == null)
+{
+    <p>Cargando...</p>
+}
+else if (!items.Any())
+{
+    <p>No hay intereses registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Descripcion</th>
+                <th style="width:220px">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var it in PagedItems)
+            {
+                <tr>
+                    <td>@it.Descripcion</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary me-2" @onclick="() => Edit(it.Id)">Editar</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(it.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")"><a class="page-link" href="#" @onclick="Previous">Anterior</a></li>
+                @for (int p = 1; p <= totalPages; p++)
+                {
+                    <li class="page-item @(currentPage == p ? "active" : "")"><a class="page-link" href="#" @onclick="() => GoTo(p)">@p</a></li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")"><a class="page-link" href="#" @onclick="Next">Siguiente</a></li>
+            </ul>
+        </nav>
+    }
+}
+
+@code {
+    private List<InteresResponse> items;
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => (int)Math.Ceiling((items?.Count ?? 0) / (double)pageSize);
+
+    private IEnumerable<InteresResponse> PagedItems => (items ?? Enumerable.Empty<InteresResponse>()).Skip((currentPage - 1) * pageSize).Take(pageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await InteresService.GetAllInteresesAsync();
+    }
+
+    private void CreateNew() => Nav.NavigateTo("/Intereses/nuevo");
+    private void Edit(Guid id) => Nav.NavigateTo($"/Intereses/editar/{id}");
+    private async Task Delete(Guid id)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", "Eliminar el interés?")) return;
+        await InteresService.DeleteInteresAsync(id);
+        items = await InteresService.GetAllInteresesAsync();
+        StateHasChanged();
+    }
+
+    // pagination helpers
+    private void Previous()
+    {
+        if (currentPage > 1) currentPage--;
+    }
+    private void Next()
+    {
+        if (currentPage < totalPages) currentPage++;
+    }
+    private void GoTo(int p) => currentPage = p;
+}

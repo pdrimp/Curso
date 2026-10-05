@@ -1,0 +1,116 @@
+@page "/Clientes/nuevo"
+@page "/Clientes/editar/{Id:guid}"
+@inject IClienteService ClienteService
+@inject ITipoClienteService TipoService
+@inject IInteresService InteresService
+@inject NavigationManager Nav
+
+<h3>@(isEdit ? "Editar cliente" : "Nuevo cliente")</h3>
+
+<EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="model.Nombre" />
+        <ValidationMessage For="() => model.Nombre" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <InputText class="form-control" @bind-Value="model.Correo" />
+        <ValidationMessage For="() => model.Correo" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <InputText type="password" class="form-control" @bind-Value="model.Password" />
+        <div class="form-text">Dejar vacío al editar para mantener la contraseña actual.</div>
+        <ValidationMessage For="() => model.Password" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tipo de cliente</label>
+        <InputSelect class="form-select" @bind-Value="model.TipoClienteId">
+            <option value="">Seleccione...</option>
+            @if (tipos != null)
+            {
+                foreach (var t in tipos)
+                {
+                    <option value="@t.Id">@t.Descripcion</option>
+                }
+            }
+        </InputSelect>
+        <ValidationMessage For="() => model.TipoClienteId" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Intereses</label>
+        @if (intereses != null)
+        {
+            foreach (var it in intereses)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="chk-@it.Id" @onchange="(e) => OnToggleInteres(e, it.Id)" checked="@SelectedInteresIds.Contains(it.Id)" />
+                    <label class="form-check-label" for="chk-@it.Id">@it.Descripcion</label>
+                </div>
+            }
+        }
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick="Cancel">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private ClienteInput model = new ClienteInput();
+    private bool isEdit => Id.HasValue && Id.Value != Guid.Empty;
+    private List<TipoClienteResponse> tipos;
+    private List<InteresResponse> intereses;
+    private HashSet<Guid> SelectedInteresIds = new HashSet<Guid>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        tipos = await TipoService.GetAllTiposClientesAsync();
+        intereses = await InteresService.GetAllInteresesAsync();
+
+        if (isEdit)
+        {
+            var existing = await ClienteService.GetClienteByIdAsync(Id.Value);
+            if (existing != null)
+            {
+                model.Nombre = existing.Nombre;
+                model.Correo = existing.Correo;
+                model.TipoClienteId = existing.TipoClienteId;
+                SelectedInteresIds = new HashSet<Guid>(existing.InteresIds ?? Enumerable.Empty<Guid>());
+            }
+        }
+    }
+
+    private void OnToggleInteres(ChangeEventArgs e, Guid interesId)
+    {
+        var isChecked = e?.Value?.ToString() == "on" || e?.Value?.ToString() == "true";
+        if (isChecked) SelectedInteresIds.Add(interesId);
+        else SelectedInteresIds.Remove(interesId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        model.InteresIds = SelectedInteresIds.ToArray();
+        if (isEdit)
+        {
+            await ClienteService.UpdateClienteAsync(Id.Value, model);
+        }
+        else
+        {
+            await ClienteService.CrearClienteAsync(model);
+        }
+        Nav.NavigateTo("/Clientes");
+    }
+
+    private void Cancel() => Nav.NavigateTo("/Clientes");
+}
