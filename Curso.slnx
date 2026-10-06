@@ -1,4 +1,5 @@
 <Solution>
+  <Folder Name="/Plans/" />
   <Folder Name="/Specs/">
     <File Path=".github/Specs/SpecClientes.md" />
     <File Path=".github/Specs/SpecIntereses.md" />

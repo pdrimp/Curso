@@ -93,7 +93,8 @@
 
     private void OnToggleInteres(ChangeEventArgs e, Guid interesId)
     {
-        var isChecked = e?.Value?.ToString() == "on" || e?.Value?.ToString() == "true";
+        //var isChecked = e?.Value?.ToString() == "on" || e?.Value?.ToString() == "true";
+        var isChecked = e?.Value?.ToString() == "True";
         if (isChecked) SelectedInteresIds.Add(interesId);
         else SelectedInteresIds.Remove(interesId);
     }

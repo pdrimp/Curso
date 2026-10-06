@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Curso.Application.Interfaces;
 using Curso.Domain.Entities;
 using Curso.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Curso.Infrastructure.Repositories
 {
@@ -34,7 +30,11 @@ namespace Curso.Infrastructure.Repositories
 
         public async Task<List<Cliente>> GetAllAsync()
         {
-            return await _db.Clientes.Include(c => c.TipoCliente).Include(c => c.Intereses).AsNoTracking().ToListAsync();
+            return await _db.Clientes
+                            .Include(c => c.TipoCliente)
+                            //.Include(c => c.Intereses)
+                            .AsNoTracking()
+                            .ToListAsync();
         }
 
         public async Task<Cliente> GetByEmailAsync(string email)

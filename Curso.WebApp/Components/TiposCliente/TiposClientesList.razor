@@ -2,6 +2,7 @@
 @inject ITipoClienteService TipoService
 @inject NavigationManager Nav
 
+
 <h3>Tipos de Cliente</h3>
 
 <div class="mb-3">
@@ -18,6 +19,20 @@ else if (!items.Any())
 }
 else
 {
+        <QuickGrid Items="items.AsQueryable()" Pagination="@pagination" class="table table-striped">
+        <PropertyColumn Property="@(p => p.Descripcion)" Title="Descripción" Sortable="true" />
+        <TemplateColumn Title="Acciones">
+            <ChildContent Context="item">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-sm btn-secondary me-2" @onclick="() => Edit(item.Id)">Editar</button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => Delete(item.Id)">Eliminar</button>
+                </div>
+            </ChildContent>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="@pagination" />
+
+@* 
     <table class="table table-striped">
         <thead>
             <tr>
@@ -37,7 +52,7 @@ else
                 </tr>
             }
         </tbody>
-    </table>
+    </table> *@
 
     @if (totalPages > 1)
     {
@@ -55,6 +70,7 @@ else
 }
 
 @code {
+    private PaginationState pagination = new() { ItemsPerPage = 10 };
     private List<TipoClienteResponse> items;
     private int pageSize = 10;
     private int currentPage = 1;

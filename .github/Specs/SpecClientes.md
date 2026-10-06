@@ -87,9 +87,9 @@ El componente ClientesList debe ser accesado por la URL `/Clientes` para listar 
 
 ### Escenario 1: Creación exitosa de un cliente
 
-* **GIVEN** que un administrador envía un nombre válido, un correo no registrado previamente y una contraseña que cumple los requisitos de complejidad.
+* **GIVEN** que un administrador envía un nombre válido, un correo no registrado previamente.
 * **WHEN** se invoca la función de creación de cliente.
-* **THEN** el sistema debe almacenar el cliente con la contraseña cifrada, retornar un código de éxito.
+* **THEN** el sistema debe almacenar el cliente, retornar un código de éxito.
 
 ### Escenario 2: Intento de registro con correo duplicado
 
